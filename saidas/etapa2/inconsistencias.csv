@@ -1,0 +1,27 @@
+verificacao,linhas,percentual
+Nota CN fora de 0 a 1000,0,0.0
+"Nota CN preenchida, mas presença diferente de 1",0,0.0
+"Presença 1 em CN, mas sem nota",0,0.0
+"Presença com código fora de 0, 1 e 2 em CN",0,0.0
+Nota CH fora de 0 a 1000,0,0.0
+"Nota CH preenchida, mas presença diferente de 1",0,0.0
+"Presença 1 em CH, mas sem nota",0,0.0
+"Presença com código fora de 0, 1 e 2 em CH",0,0.0
+Nota LC fora de 0 a 1000,0,0.0
+"Nota LC preenchida, mas presença diferente de 1",0,0.0
+"Presença 1 em LC, mas sem nota",0,0.0
+"Presença com código fora de 0, 1 e 2 em LC",0,0.0
+Nota MT fora de 0 a 1000,0,0.0
+"Nota MT preenchida, mas presença diferente de 1",0,0.0
+"Presença 1 em MT, mas sem nota",0,0.0
+"Presença com código fora de 0, 1 e 2 em MT",0,0.0
+Nota da redação fora de 0 a 1000,0,0.0
+"Redação preenchida, mas presença LC diferente de 1",0,0.0
+"Presença LC 1, mas redação sem nota",0,0.0
+Redação diferente da soma das 5 competências,0,0.0
+"Redação com nota, mas competências incompletas",0,0.0
+Nota de redação zero com status 1 (sem problemas),0,0.0
+Nota de redação maior que zero com status diferente de 1,0,0.0
+Dependência administrativa fora de 1 a 4,0,0.0
+Localização da escola fora de 1 a 2,0,0.0
+UF da escola diferente da UF da prova (só quem tem escola),16672,0.347

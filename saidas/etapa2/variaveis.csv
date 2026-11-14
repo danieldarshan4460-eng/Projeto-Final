@@ -1,0 +1,71 @@
+nome,tipo,exemplo,grupo,usada_na_analise
+NU_SEQUENCIAL,int64,206403,identificação,sim
+NU_ANO,int64,2025,identificação,sim
+CO_ESCOLA,float64,33083592.0,escola,não
+CO_MUNICIPIO_ESC,float64,3304557.0,escola,sim
+NO_MUNICIPIO_ESC,str,Rio de Janeiro,escola,sim
+CO_UF_ESC,float64,33.0,escola,sim
+SG_UF_ESC,str,RJ,escola,sim
+TP_DEPENDENCIA_ADM_ESC,float64,2.0,escola,sim
+TP_LOCALIZACAO_ESC,float64,1.0,escola,sim
+TP_SIT_FUNC_ESC,float64,1.0,escola,sim
+CO_MUNICIPIO_PROVA,int64,3304557,local da prova,não
+NO_MUNICIPIO_PROVA,str,Rio de Janeiro,local da prova,não
+CO_UF_PROVA,int64,33,local da prova,não
+SG_UF_PROVA,str,RJ,local da prova,sim
+TP_PRESENCA_CN,int64,1,presença,sim
+TP_PRESENCA_CH,int64,1,presença,sim
+TP_PRESENCA_LC,int64,1,presença,sim
+TP_PRESENCA_MT,int64,1,presença,sim
+CO_PROVA_CN,float64,1484.0,prova (versão e opção),não
+CO_PROVA_CH,float64,1447.0,prova (versão e opção),não
+CO_PROVA_LC,float64,1459.0,prova (versão e opção),não
+CO_PROVA_MT,float64,1472.0,prova (versão e opção),não
+NU_NOTA_CN,float64,524.1,notas,sim
+NU_NOTA_CH,float64,624.2,notas,sim
+NU_NOTA_LC,float64,534.9,notas,sim
+NU_NOTA_MT,float64,653.6,notas,sim
+TX_RESPOSTAS_CN,str,ABDDCCAECABEEABBBADCAEEDDBDCBDBDCBBAADBDAECBB,texto/respostas,não
+TX_RESPOSTAS_CH,str,EEDCDACBEECADBCAEBBCCEEBEADADBCABACBCDDACBCEB,texto/respostas,não
+TX_RESPOSTAS_LC,str,DCCEADEDCEDBCCACCCBBDCABEBABBCCBCACABBCCBAEDC,texto/respostas,não
+TX_RESPOSTAS_MT,str,CACBAEDBEBCBDECDDDDADDBCADBADBDBCBCBDEABCBBBC,texto/respostas,não
+TP_LINGUA,int64,0,prova (versão e opção),não
+TX_GABARITO_CN,str,CBDDCDAEAAAECBBCEAEEBDEEXABBBDXCDCBBBDCEADDCD,texto/respostas,não
+TX_GABARITO_CH,str,EDECADCEEDCADBDEBBACDDECBADABBCABACEEDDBCBCEA,texto/respostas,não
+TX_GABARITO_LC,str,DDDEABADDCECDCEBCECAECAEBCBCBEBABABDEBCEDABCABADDC,texto/respostas,não
+TX_GABARITO_MT,str,CECCADDBEBCACECBDDDBADEEABBECCDABEADDEBEAAXCC,texto/respostas,não
+TP_STATUS_REDACAO,float64,1.0,redação,sim
+NU_NOTA_COMP1,float64,120.0,redação,sim
+NU_NOTA_COMP2,float64,160.0,redação,sim
+NU_NOTA_COMP3,float64,140.0,redação,sim
+NU_NOTA_COMP4,float64,120.0,redação,sim
+NU_NOTA_COMP5,float64,100.0,redação,sim
+NU_NOTA_REDACAO,float64,640.0,redação,sim
+TP_STATUS_REDACAO_AV1,float64,1.0,avaliadores,só checagem
+NU_NOTA_AV1,float64,600.0,avaliadores,só checagem
+NU_NOTA_COMP1_AV1,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP2_AV1,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP3_AV1,float64,160.0,avaliadores,só checagem
+NU_NOTA_COMP4_AV1,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP5_AV1,float64,80.0,avaliadores,só checagem
+TP_STATUS_REDACAO_AV2,float64,1.0,avaliadores,só checagem
+NU_NOTA_AV2,float64,680.0,avaliadores,só checagem
+NU_NOTA_COMP1_AV2,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP2_AV2,float64,200.0,avaliadores,só checagem
+NU_NOTA_COMP3_AV2,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP4_AV2,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP5_AV2,float64,120.0,avaliadores,só checagem
+TP_STATUS_REDACAO_AV3,float64,1.0,avaliadores,só checagem
+NU_NOTA_AV3,float64,640.0,avaliadores,só checagem
+NU_NOTA_COMP1_AV3,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP2_AV3,float64,160.0,avaliadores,só checagem
+NU_NOTA_COMP3_AV3,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP4_AV3,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP5_AV3,float64,120.0,avaliadores,só checagem
+TP_STATUS_REDACAO_AV4,float64,1.0,avaliadores,só checagem
+NU_NOTA_AV4,float64,680.0,avaliadores,só checagem
+NU_NOTA_COMP1_AV4,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP2_AV4,float64,160.0,avaliadores,só checagem
+NU_NOTA_COMP3_AV4,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP4_AV4,float64,120.0,avaliadores,só checagem
+NU_NOTA_COMP5_AV4,float64,160.0,avaliadores,só checagem
