@@ -1,5 +1,6 @@
 """Cálculos e tabelas feitas com Pandas."""
 
+import numpy as np
 import pandas as pd
 
 from .indicador import IndicadorPontos, Nota, Numerico, Percentual
@@ -199,3 +200,96 @@ class AnalisadorDados:
             IndicadorPontos("Diferença privada x estadual", diferenca),
             IndicadorPontos("Amplitude entre UFs", amplitude),
         ]
+
+    def tabela_regiao_uf(self) -> pd.DataFrame:
+        """Reúne inscritos, média geral e presença no 2º dia por UF."""
+        if "SG_UF_PROVA" not in self.df.columns:
+            return pd.DataFrame(columns=[
+                "REGIAO", "UF", "inscritos", "media_geral", "presenca_2dia"
+            ])
+
+        inscritos = self.df.groupby("SG_UF_PROVA", observed=False).size()
+        tabela = inscritos.reset_index(name="inscritos").rename(
+            columns={"SG_UF_PROVA": "UF"}
+        )
+
+        if "REGIAO" in self.df.columns:
+            regioes = self.df.groupby("SG_UF_PROVA", observed=False)["REGIAO"].first()
+            tabela["REGIAO"] = tabela["UF"].map(regioes)
+        else:
+            tabela["REGIAO"] = ""
+
+        completos = self._participantes_completos()
+        if not completos.empty:
+            medias = completos.groupby("SG_UF_PROVA", observed=False)["MEDIA_GERAL"].mean()
+            tabela["media_geral"] = tabela["UF"].map(medias).round(1)
+        else:
+            tabela["media_geral"] = float("nan")
+
+        if "TP_PRESENCA_MT" in self.df.columns:
+            fez_dia2 = self.df["TP_PRESENCA_MT"].eq(1).groupby(
+                self.df["SG_UF_PROVA"], observed=False
+            ).sum()
+            tabela["presenca_2dia"] = (
+                tabela["UF"].map(fez_dia2).astype("float64")
+                / tabela["inscritos"].astype("float64") * 100
+            ).round(1)
+        else:
+            tabela["presenca_2dia"] = float("nan")
+
+        tabela = tabela[["REGIAO", "UF", "inscritos", "media_geral", "presenca_2dia"]]
+        return tabela.sort_values(["REGIAO", "UF"], na_position="last").reset_index(drop=True)
+
+    def distribuicao_media_por_rede(self, largura=50) -> pd.DataFrame:
+        """Distribui as médias gerais dentro de cada tipo de escola."""
+        completos = self._participantes_completos()
+        if completos.empty or "REDE_NOME" not in completos.columns:
+            return pd.DataFrame(columns=["faixa", "rede", "percentual"])
+
+        dados = completos.loc[
+            completos["REDE_NOME"].notna()
+            & completos["REDE_NOME"].ne("")
+            & completos["MEDIA_GERAL"].notna()
+        ].copy()
+        if dados.empty:
+            return pd.DataFrame(columns=["faixa", "rede", "percentual"])
+
+        limites = np.arange(0, 1001, largura)
+        if limites[-1] != 1000:
+            limites = np.append(limites, 1000)
+
+        linhas = []
+        for rede, parte in dados.groupby("REDE_NOME", observed=False):
+            medias = parte["MEDIA_GERAL"].clip(0, 1000).to_numpy(dtype="float64")
+            contagens, _ = np.histogram(medias, bins=limites)
+            total = int(contagens.sum())
+
+            for inicio, contagem in zip(limites[:-1], contagens):
+                percentual = contagem / total * 100 if total else 0.0
+                linhas.append({
+                    "faixa": int(inicio),
+                    "rede": str(rede),
+                    "percentual": round(float(percentual), 1),
+                })
+
+        return pd.DataFrame(linhas)
+
+    def histograma_redacao(self, largura=20) -> pd.DataFrame:
+        """Conta notas de redação em faixas de 0 a 1000 pontos."""
+        if "NU_NOTA_REDACAO" not in self.df.columns:
+            return pd.DataFrame(columns=["faixa", "pessoas"])
+
+        notas = pd.to_numeric(
+            self.df["NU_NOTA_REDACAO"].dropna(), errors="coerce"
+        ).dropna()
+        notas = notas.loc[(notas >= 0) & (notas <= 1000)].to_numpy(dtype="float64")
+
+        limites = np.arange(0, 1001, largura)
+        if limites[-1] != 1000:
+            limites = np.append(limites, 1000)
+
+        contagens, _ = np.histogram(notas, bins=limites)
+        return pd.DataFrame({
+            "faixa": limites[:-1].astype(int),
+            "pessoas": contagens.astype(int),
+        })
