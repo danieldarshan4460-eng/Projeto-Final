@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIB per Capita Regional vs. ENCCEJA | Documentação do Projeto</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+      color: #fff;
+      padding: 3.25rem 1.5rem;
+      text-align: center;
+    }
+    header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      max-width: 880px;
+      margin: 0 auto 0.75rem;
+      line-height: 1.25;
+    }
+    header p {
+      font-size: 1.02rem;
+      opacity: 0.9;
+      max-width: 740px;
+      margin: 0 auto 1.25rem;
+    }
+    header a.repo-btn {
+      display: inline-block;
+      background: #fff;
+      color: #1e3a8a;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.6rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.92rem;
+    }
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin: 0 0.65rem;
+    }
+    nav a:hover { color: var(--accent); }
+    main { max-width: 1060px; margin: 2rem auto; padding: 0 1.25rem; }
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    h2 {
+      color: var(--primary);
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    h3 {
+      color: var(--accent);
+      font-size: 1.08rem;
+      margin: 1.25rem 0 0.5rem;
+    }
+    p { margin-bottom: 0.9rem; }
+    ul, ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+    li { margin-bottom: 0.45rem; }
+    code {
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.88em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 1.1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      margin: 1rem 0;
+    }
+    .table-wrap { overflow-x: auto; margin: 1rem 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+    }
+    th { background: #f1f5f9; color: var(--primary); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.15rem;
+      background: var(--bg);
+    }
+    .card strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+      font-size: 0.98rem;
+    }
+    .kpi-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 0.25rem;
+    }
+    .chart-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+      background: #ffffff;
+    }
+    .chart-box iframe {
+      width: 100%;
+      height: 520px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-top: 0.75rem;
+      background: #fff;
+    }
+    .status-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--accent-light);
+      padding: 0.6rem 0.9rem;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="badge">Programação Orientada à Objetos • Ciência de Dados e IA</span>
+  <h1>Relação entre o PIB per Capita Regional e o Desempenho no ENCCEJA</h1>
+  <p>Documentação técnica da arquitetura em Python, pipeline de tratamento com Pandas, visualizações interativas com Plotly e dashboard dinâmico.</p>
+  <a class="repo-btn" href="https://github.com/danieldarshan4460-eng/Projeto-Final" target="_blank" rel="noopener">Acessar Repositório no GitHub</a>
+</header>
+
+<nav>
+  <a href="#justificativa">1. Tema</a>
+  <a href="#fontes">2. Fontes</a>
+  <a href="#variaveis">3. Variáveis</a>
+  <a href="#tratamento">4. Tratamento</a>
+  <a href="#arquitetura">5. Arquitetura POO</a>
+  <a href="#classes">6. Classes</a>
+  <a href="#indicadores">7. Indicadores</a>
+  <a href="#graficos">8. Gráficos</a>
+  <a href="#dashboard">9. Dashboard</a>
+  <a href="#conclusoes">10. Conclusões</a>
+  <a href="#referencias">11. Referências</a>
+</nav>
+
+<main>
+
+  <!-- 1. Justificativa -->
+  <section id="justificativa">
+    <h2>1. Justificativa da Escolha do Tema</h2>
+    <p>
+      O Exame Nacional para Certificação de Competências de Jovens e Adultos (ENCCEJA) é o principal instrumento federal de avaliação e certificação escolar para jovens e adultos que não concluíram o Ensino Fundamental ou o Ensino Médio na idade apropriada. Investigar como o <strong>PIB per capita das regiões brasileiras</strong> se relaciona com as notas obtidas pelos participantes permite avaliar o impacto das desigualdades socioeconômicas regionais na recomposição da escolaridade da população adulta.
+    </p>
+    <p>
+      Sob a ótica de Ciência de Dados aplicada à tomada de decisão, o cruzamento entre indicadores econômicos regionais e microdados educacionais subsidia diagnósticos sobre abstenção (funil de presença) e disparidades de desempenho por região, Unidade da Federação, rede de ensino e localização.
+    </p>
+  </section>
+
+  <!-- 2. Fontes -->
+  <section id="fontes">
+    <h2>2. Identificação e Descrição das Fontes Públicas de Dados</h2>
+    <ul>
+      <li>
+        <strong>Educação — Microdados do ENCCEJA (INEP):</strong> Disponibilizados no portal de Dados Abertos do INEP (<code>gov.br/inep/pt-br/acesso-a-informacao/dados-abertos</code>). Contêm registros individualizados e anonimizados sobre perfil do participante, UF, Grande Região, localização (urbana/rural), rede escolar, presença e notas nas quatro áreas objetivas e na redação.
+      </li>
+      <li>
+        <strong>Economia — PIB per Capita Regional (Portal Brasileiro de Dados Abertos / IBGE / Banco Central):</strong> Extraídos de bases públicas oficiais (<code>dados.gov.br</code> e <code>dadosabertos.bcb.gov.br</code>), fornecendo o PIB a preços correntes e o PIB per capita (R$) por Unidade da Federação e Grande Região (Norte, Nordeste, Centro-Oeste, Sudeste e Sul).
+      </li>
+    </ul>
+  </section>
+
+  <!-- 3. Variáveis -->
+  <section id="variaveis">
+    <h2>3. Descrição das Variáveis Utilizadas</h2>
+    <p>O dicionário de variáveis catalogado em <code>saidas/etapa2/variaveis.csv</code> estrutura os seguintes atributos principais:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Variável</th>
+            <th>Origem</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>NO_REGIAO</code></td>
+            <td>INEP / IBGE</td>
+            <td>Categórica (<code>str</code>)</td>
+            <td>Grande Região geográfica (Norte, Nordeste, Centro-Oeste, Sudeste, Sul).</td>
+          </tr>
+          <tr>
+            <td><code>SG_UF_PROVA</code></td>
+            <td>INEP / IBGE</td>
+            <td>Categórica (<code>str</code>)</td>
+            <td>Sigla da Unidade da Federação de realização da prova (chave relacional).</td>
+          </tr>
+          <tr>
+            <td><code>TP_LOCALIZACAO</code> / Rede</td>
+            <td>INEP</td>
+            <td>Categórica (<code>str</code>)</td>
+            <td>Classificação da localização (Urbana/Rural) e rede escolar do participante.</td>
+          </tr>
+          <tr>
+            <td><code>TP_PRESENCA_*</code></td>
+            <td>INEP</td>
+            <td>Categórica (<code>int</code>)</td>
+            <td>Indicador de comparecimento nas provas objetivas e na redação.</td>
+          </tr>
+          <tr>
+            <td><code>NU_NOTA_CN</code>, <code>NU_NOTA_CH</code>, <code>NU_NOTA_LC</code>, <code>NU_NOTA_MT</code></td>
+            <td>INEP</td>
+            <td>Numérica (<code>float64</code>)</td>
+            <td>Notas nas áreas de Ciências da Natureza, Ciências Humanas, Linguagens e Matemática.</td>
+          </tr>
+          <tr>
+            <td><code>NU_NOTA_REDACAO</code></td>
+            <td>INEP</td>
+            <td>Numérica (<code>float64</code>)</td>
+            <td>Nota obtida na prova de Redação (escala de 0 a 10).</td>
+          </tr>
+          <tr>
+            <td><code>PIB_PER_CAPITA</code></td>
+            <td>IBGE / BCB</td>
+            <td>Numérica (<code>float64</code>)</td>
+            <td>Produto Interno Bruto dividido pela população residente da UF/Região (em R$).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4. Tratamento -->
+  <section id="tratamento">
+    <h2>4. Procedimentos de Tratamento e Análise dos Dados (Pandas)</h2>
+    <p>O pipeline de exploração, auditoria e limpeza foi estruturado nos scripts da pasta <code>scripts/</code> e encapsulado em <code>analise_resultados/tratador.py</code>:</p>
+    <ol>
+      <li><strong>Exploração Inicial e Redução de Base (<code>etapa2_exploracao.py</code>, <code>item6_exploracao.py</code>, <code>item7_arquivo_reduzido.py</code>):</strong> Inspeção de tipos de dados, levantamento de estatísticas descritivas (<code>estatisticas_notas.csv</code>) e criação de arquivo reduzido com as colunas essenciais.</li>
+      <li><strong>Auditoria de Duplicidades e Inconsistências (<code>item4_duplicidades.py</code>, <code>item5_inconsistencias.py</code>):</strong> Identificação e tratamento de registros duplicados (<code>duplicidades.csv</code>) e inconsistências de domínio (<code>inconsistencias.csv</code>).</li>
+      <li><strong>Tratamento de Valores Ausentes e Filtro de Presença:</strong> Mapeamento de valores nulos (<code>ausentes.csv</code>) e análise do funil de comparecimento (<code>funil_presenca.csv</code>, <code>presenca_por_uf.csv</code>), filtrando participantes presentes para não distorcer as médias regionais.</li>
+      <li><strong>Agrupamentos e Cruzamento Relacional:</strong> Agregação das médias por Região (<code>media_por_regiao.csv</code>), UF (<code>media_por_uf.csv</code>), Rede (<code>media_por_rede.csv</code>) e Localização (<code>media_por_localizacao.csv</code>), cruzadas com o PIB per capita regional.</li>
+    </ol>
+  </section>
+
+  <!-- 5. Arquitetura POO -->
+  <section id="arquitetura">
+    <h2>5. Descrição da Arquitetura Orientada a Objetos</h2>
+    <p>
+      O projeto aplica o paradigma de <strong>Programação Orientada a Objetos (POO)</strong> e os princípios <strong>SOLID</strong>, dividindo as responsabilidades em módulos independentes dentro do pacote <code>analise_resultados/</code>:
+    </p>
+    <pre>Projeto-Final/
+├── analise_resultados/
+│   ├── tratador.py        # Limpeza, filtragem, tratamento de nulos e padronização
+│   ├── analisador.py      # Agregações, estatísticas descritivas e cruzamento PIB × ENCCEJA
+│   ├── indicador.py       # Encapsulamento de métricas e KPIs calculados
+│   └── visualizador.py    # Geração padronizada de gráficos interativos (Plotly)
+├── scripts/               # Pipeline de exploração e auditoria (Etapa 2)
+├── saidas/etapa2/         # Tabelas CSV consolidadas e gráficos HTML interativos
+├── etapa5_graficos.py     # Orquestração das visualizações analíticas principais
+└── requirements.txt       # Dependências do ambiente Python</pre>
+  </section>
+
+  <!-- 6. Classes -->
+  <section id="classes">
+    <h2>6. Módulos e Classes Implementadas</h2>
+    <div class="grid">
+      <div class="card">
+        <strong>Tratador (<code>analise_resultados/tratador.py</code>)</strong>
+        Carrega os dados brutos/reduzidos, aplica filtros de presença, trata valores ausentes, remove duplicidades e padroniza chaves geográficas (Região e UF).
+      </div>
+      <div class="card">
+        <strong>Analisador (<code>analise_resultados/analisador.py</code>)</strong>
+        Executa os agrupamentos com Pandas, calcula estatísticas descritivas (média, mediana, desvio padrão e quartis) e realiza o cruzamento entre o PIB per capita e as notas do ENCCEJA.
+      </div>
+      <div class="card">
+        <strong>Indicador (<code>analise_resultados/indicador.py</code>)</strong>
+        Modela os indicadores quantitativos do projeto como objetos, encapsulando nome, valor calculado, unidade de medida e métodos de formatação.
+      </div>
+      <div class="card">
+        <strong>Visualizador (<code>analise_resultados/visualizador.py</code>)</strong>
+        Recebe os dados agregados e constrói os gráficos interativos com a biblioteca <strong>Plotly</strong>, mantendo padronização visual e interatividade.
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Indicadores e Resultados Numéricos -->
+  <section id="indicadores">
+    <h2>7. Indicadores Desenvolvidos e Resultados Numéricos</h2>
+    <p class="status-note" id="csv-status">
+      Carregando valores numéricos diretamente dos arquivos CSV em <code>saidas/etapa2/</code>...
+    </p>
+
+    <div class="grid" id="kpi-cards">
+      <div class="card">
+        <strong>1. Estatísticas Gerais das Notas</strong>
+        <div class="kpi-value" id="kpi-notas">Carregando...</div>
+        <small>Fonte: <code>saidas/etapa2/estatisticas_notas.csv</code></small>
+      </div>
+      <div class="card">
+        <strong>2. Desempenho por Região</strong>
+        <div class="kpi-value" id="kpi-regiao">Carregando...</div>
+        <small>Fonte: <code>saidas/etapa2/media_por_regiao.csv</code></small>
+      </div>
+      <div class="card">
+        <strong>3. Funil de Presença</strong>
+        <div class="kpi-value" id="kpi-presenca">Carregando...</div>
+        <small>Fonte: <code>saidas/etapa2/funil_presenca.csv</code></small>
+      </div>
+      <div class="card">
+        <strong>4. Desempenho por UF</strong>
+        <div class="kpi-value" id="kpi-uf">Carregando...</div>
+        <small>Fonte: <code>saidas/etapa2/media_por_uf.csv</code></small>
+      </div>
+    </div>
+
+    <h3>Tabela Consolidada — Estatísticas Descritivas das Notas</h3>
+    <div class="table-wrap" id="tabela-estatisticas"></div>
+
+    <h3>Tabela Consolidada — Médias por Grande Região</h3>
+    <div class="table-wrap" id="tabela-regiao"></div>
+
+    <h3>Tabela Consolidada — Funil de Presença</h3>
+    <div class="table-wrap" id="tabela-funil"></div>
+  </section>
+
+  <!-- 8. Gráficos Interativos -->
+  <section id="graficos">
+    <h2>8. Apresentação e Interpretação dos Gráficos (Plotly)</h2>
+    <p>Visualizações interativas geradas pelo pipeline do projeto (passe o cursor sobre os gráficos para inspecionar os valores detalhados):</p>
+
+    <div class="chart-box">
+      <h3>8.1. Taxa de Presença e Distribuição por Unidade da Federação</h3>
+      <p><strong>Interpretação:</strong> Compara o volume de inscritos e o comparecimento efetivo entre as UFs e regiões brasileiras, evidenciando o peso demográfico e as taxas de abstenção em cada estado.</p>
+      <iframe src="saidas/etapa2/graficos/presenca_por_uf.html" title="Presença por UF" loading="lazy"></iframe>
+    </div>
+
+    <div class="chart-box">
+      <h3>8.2. Nota Média por Rede de Ensino e Perfil</h3>
+      <p><strong>Interpretação:</strong> Apresenta o comparativo de desempenho médio nas áreas avaliadas por rede de ensino, permitindo analisar diferenças estruturais associadas ao contexto socioeconômico.</p>
+      <iframe src="saidas/etapa2/graficos/media_por_rede.html" title="Média por Rede" loading="lazy"></iframe>
+    </div>
+
+    <div class="chart-box">
+      <h3>8.3. Distribuição das Notas de Redação (Histograma)</h3>
+      <p><strong>Interpretação:</strong> Exibe a distribuição de frequência das notas na prova de Redação, destacando a concentração em torno da nota mínima de aprovação (5,0 pontos) e os casos de nota zero.</p>
+      <iframe src="saidas/etapa2/graficos/histograma_redacao.html" title="Histograma da Redação" loading="lazy"></iframe>
+    </div>
+
+    <div class="chart-box">
+      <h3>Média Geral por UF</h3>
+      <p><strong>Interpretação:</strong> Compara a média geral obtida pelos participantes entre as Unidades da Federação.</p>
+      <iframe src="saidas/etapa5/barras_media_uf.html" title="Média Geral por UF" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <!-- 9. Dashboard -->
+  <section id="dashboard">
+    <h2>9. Explicação do Funcionamento do Dashboard</h2>
+    <p>A camada de apresentação integra os objetos de <code>analise_resultados/</code> em um painel interativo estruturado nos seguintes componentes:</p>
+    <ul>
+      <li><strong>Cabeçalho Institucional:</strong> Contextualiza o cruzamento entre PIB per capita regional (IBGE/BCB) e desempenho no ENCCEJA (INEP).</li>
+      <li><strong>Filtros Interativos:</strong> Permitem segmentar a análise por Grande Região, Unidade da Federação (UF), área do conhecimento, rede e localização.</li>
+      <li><strong>Cartões de KPIs:</strong> Exibem os indicadores principais encapsulados pela classe <code>Indicador</code>.</li>
+      <li><strong>Visualizações Dinâmicas e Tabelas:</strong> Renderizam os gráficos interativos gerados pelo <code>Visualizador</code> juntamente com os resumos tabulares consolidados.</li>
+    </ul>
+  </section>
+
+  <!-- 10. Conclusões -->
+  <section id="conclusoes">
+    <h2>10. Principais Conclusões e Limitações da Análise</h2>
+    <h3>Principais Conclusões</h3>
+    <ul>
+      <li>Os dados evidenciam associação positiva entre o PIB per capita regional e o desempenho médio no ENCCEJA, refletindo desigualdades socioeconômicas entre as regiões brasileiras.</li>
+      <li>A análise do funil de presença mostra que a abstenção representa um desafio relevante para a certificação de jovens e adultos em todas as UFs.</li>
+      <li>Os recortes por rede e localização complementam a leitura macroeconômica ao revelar disparidades internas dentro das próprias regiões.</li>
+    </ul>
+    <h3>Limitações da Análise</h3>
+    <ul>
+      <li><strong>Agregação Regional (Falácia Ecológica):</strong> O PIB per capita representa uma média territorial por UF/Região e não a renda domiciliar individual de cada candidato.</li>
+      <li><strong>Autosseleção da Amostra:</strong> Os microdados contemplam apenas cidadãos que se inscreveram e compareceram às provas.</li>
+    </ul>
+  </section>
+
+  <!-- 11. Referências -->
+  <section id="referencias">
+    <h2>11. Referências Utilizadas</h2>
+    <ul>
+      <li>INEP — Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira. <strong>Microdados do ENCCEJA</strong>. Disponível em: <code>https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos</code>.</li>
+      <li>IBGE / Portal Brasileiro de Dados Abertos. <strong>Produto Interno Bruto Regional e Municipal</strong>. Disponível em: <code>https://dados.gov.br/home</code>.</li>
+      <li>BANCO CENTRAL DO BRASIL (BCB). <strong>Portal de Dados Abertos</strong>. Disponível em: <code>https://dadosabertos.bcb.gov.br/</code>.</li>
+      <li>DOCUMENTAÇÃO OFICIAL: Python, Pandas, Plotly e Streamlit.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  <p>Projeto Final — Programação Orientada à Objetos (Ciência de Dados e Inteligência Artificial)</p>
+</footer>
+
+<script>
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/).filter(Boolean);
+    if (!lines.length) return [];
+    const sep = lines[0].includes(';') ? ';' : ',';
+    return lines.map(line => line.split(sep).map(cell => cell.replace(/^"|"$/g, '').trim()));
+  }
+
+  function renderTable(containerId, rows) {
+    const el = document.getElementById(containerId);
+    if (!rows || rows.length === 0) {
+      el.innerHTML = '<p class="status-note">Arquivo CSV não encontrado no caminho relativo. Certifique-se de incluir a pasta <code>saidas/</code> na branch <code>gh-pages</code>.</p>';
+      return;
+    }
+    let html = '<table><thead><tr>';
+    rows[0].forEach(h => { html += `<th>${h}</th>`; });
+    html += '</tr></thead><tbody>';
+    rows.slice(1).forEach(r => {
+      html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>';
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  async function loadCSV(path) {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) return null;
+      return parseCSV(await res.text());
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function initData() {
+    const [est, reg, funil, uf] = await Promise.all([
+      loadCSV('saidas/etapa2/estatisticas_notas.csv'),
+      loadCSV('saidas/etapa2/media_por_regiao.csv'),
+      loadCSV('saidas/etapa2/funil_presenca.csv'),
+      loadCSV('saidas/etapa2/media_por_uf.csv')
+    ]);
+
+    renderTable('tabela-estatisticas', est);
+    renderTable('tabela-regiao', reg);
+    renderTable('tabela-funil', funil);
+
+    const statusEl = document.getElementById('csv-status');
+    if (est || reg || funil || uf) {
+      statusEl.textContent = 'Valores carregados automaticamente a partir dos arquivos CSV do repositório.';
+      document.getElementById('kpi-notas').textContent = est ? `${est.length - 1} métricas calculadas` : 'Indisponível';
+      document.getElementById('kpi-regiao').textContent = reg ? `${reg.length - 1} regiões avaliadas` : 'Indisponível';
+      document.getElementById('kpi-presenca').textContent = funil ? `${funil.length - 1} etapas do funil` : 'Indisponível';
+      document.getElementById('kpi-uf').textContent = uf ? `${uf.length - 1} UFs consolidadas` : 'Indisponível';
+    } else {
+      statusEl.innerHTML = 'Para exibir os números automaticamente, copie também a pasta <code>saidas/</code> para a branch <code>gh-pages</code>.';
+      document.getElementById('kpi-notas').textContent = 'Ver CSV';
+      document.getElementById('kpi-regiao').textContent = 'Ver CSV';
+      document.getElementById('kpi-presenca').textContent = 'Ver CSV';
+      document.getElementById('kpi-uf').textContent = 'Ver CSV';
+    }
+  }
+
+  initData();
+</script>
+
+</body>
+</html>
