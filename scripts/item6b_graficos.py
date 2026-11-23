@@ -7,13 +7,14 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+from analise_resultados import FonteParquet
+
 
 RAIZ = Path(__file__).resolve().parents[1]
-ARQUIVO_CSV = RAIZ / "data" / "RESULTADOS_2025.csv"
+ARQUIVO_PARQUET = RAIZ / "data" / "resultados_reduzido.parquet"
 ARQUIVO_MEDIA_REDE = RAIZ / "saidas" / "etapa2" / "media_por_rede.csv"
 PASTA_ETAPA2 = RAIZ / "saidas" / "etapa2"
 PASTA_GRAFICOS = PASTA_ETAPA2 / "graficos"
-TAMANHO_BLOCO = 500_000
 COLUNAS_LEITURA = [
     "SG_UF_PROVA",
     "TP_PRESENCA_LC",
@@ -24,58 +25,30 @@ LIMITES_REDACAO = np.arange(0, 1001, 20)
 
 
 def processar_dados_grandes() -> tuple[pd.DataFrame, np.ndarray, int]:
-    """Conta presenças por UF e notas de redação, lendo cada bloco uma vez."""
-    totais_uf: dict[str, list[int]] = {}
-    contagens_redacao = np.zeros(len(LIMITES_REDACAO) - 1, dtype=np.int64)
-    total_redacoes_validas = 0
-
-    blocos = pd.read_csv(
-        ARQUIVO_CSV,
-        sep=";",
-        encoding="latin1",
-        usecols=COLUNAS_LEITURA,
-        dtype={
-            "TP_PRESENCA_LC": "float32",
-            "TP_PRESENCA_MT": "float32",
-            "NU_NOTA_REDACAO": "float32",
-        },
-        chunksize=TAMANHO_BLOCO,
+    """Conta presenças por UF e notas de redação usando só as colunas necessárias."""
+    dados = FonteParquet(ARQUIVO_PARQUET).carregar(colunas=COLUNAS_LEITURA)
+    dados["_dia1"] = dados["TP_PRESENCA_LC"].eq(1).astype("int8")
+    dados["_dia2"] = dados["TP_PRESENCA_MT"].eq(1).astype("int8")
+    por_uf = dados.groupby("SG_UF_PROVA").agg(
+        inscritos=("_dia1", "size"),
+        dia1=("_dia1", "sum"),
+        dia2=("_dia2", "sum"),
     )
-
-    for bloco in blocos:
-        bloco["_dia1"] = bloco["TP_PRESENCA_LC"].eq(1).astype("int8")
-        bloco["_dia2"] = bloco["TP_PRESENCA_MT"].eq(1).astype("int8")
-        por_uf = bloco.groupby("SG_UF_PROVA").agg(
-            inscritos=("_dia1", "size"),
-            dia1=("_dia1", "sum"),
-            dia2=("_dia2", "sum"),
-        )
-
-        for uf, linha in por_uf.iterrows():
-            uf = str(uf)
-            acumulado = totais_uf.setdefault(uf, [0, 0, 0])
-            acumulado[0] += int(linha["inscritos"])
-            acumulado[1] += int(linha["dia1"])
-            acumulado[2] += int(linha["dia2"])
-
-        notas = bloco["NU_NOTA_REDACAO"].dropna().to_numpy(dtype=np.float64)
-        contagens_bloco, _ = np.histogram(notas, bins=LIMITES_REDACAO)
-        contagens_redacao += contagens_bloco
-        total_redacoes_validas += int(notas.size)
-
-    linhas_uf = [
+    presenca_por_uf = pd.DataFrame(
         {
-            "SG_UF_PROVA": uf,
-            "inscritos": valores[0],
-            "presenca_1o_dia_pct": valores[1] / valores[0] * 100,
-            "presenca_2o_dia_pct": valores[2] / valores[0] * 100,
+            "SG_UF_PROVA": por_uf.index,
+            "inscritos": por_uf["inscritos"],
+            "presenca_1o_dia_pct": por_uf["dia1"] / por_uf["inscritos"] * 100,
+            "presenca_2o_dia_pct": por_uf["dia2"] / por_uf["inscritos"] * 100,
         }
-        for uf, valores in totais_uf.items()
-        if valores[0] > 0
-    ]
-    presenca_por_uf = pd.DataFrame(linhas_uf).sort_values(
+    )
+    presenca_por_uf = presenca_por_uf.sort_values(
         "presenca_1o_dia_pct", ascending=False
     )
+
+    notas = dados["NU_NOTA_REDACAO"].dropna().to_numpy(dtype=np.float64)
+    contagens_redacao, _ = np.histogram(notas, bins=LIMITES_REDACAO)
+    total_redacoes_validas = int(notas.size)
     return presenca_por_uf, contagens_redacao, total_redacoes_validas
 
 
@@ -221,8 +194,8 @@ def main() -> None:
             f"Arquivo não encontrado: {ARQUIVO_MEDIA_REDE}. "
             "Rode o item 6A antes do item 6B."
         )
-    if not ARQUIVO_CSV.is_file():
-        raise FileNotFoundError(f"Arquivo não encontrado: {ARQUIVO_CSV}")
+    if not ARQUIVO_PARQUET.is_file():
+        raise FileNotFoundError(f"Arquivo não encontrado: {ARQUIVO_PARQUET}")
 
     PASTA_GRAFICOS.mkdir(parents=True, exist_ok=True)
     criar_grafico_media_por_rede()

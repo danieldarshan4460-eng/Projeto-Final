@@ -9,8 +9,17 @@ from .indicador import (
     IndicadorNota,
     IndicadorNumerico,
     IndicadorPercentual,
+    IndicadorPontos,
 )
-from .visualizador import GraficoBarras, Visualizador
+from .visualizador import (
+    GraficoBarras,
+    GraficoDispersao,
+    GraficoHistograma,
+    GraficoLinhas,
+    GraficoPizza,
+    Visualizador,
+)
+from .tratador import TratadorDados
 
 __all__ = [
     "AnalisadorDados",
@@ -23,10 +32,16 @@ __all__ = [
     "IndicadorNota",
     "IndicadorNumerico",
     "IndicadorPercentual",
+    "IndicadorPontos",
     "LOCALIZACAO",
     "NOTAS",
     "PRESENCA_DIA",
     "REGIAO_POR_UF",
     "REDE",
     "Visualizador",
+    "GraficoDispersao",
+    "GraficoHistograma",
+    "GraficoLinhas",
+    "GraficoPizza",
+    "TratadorDados",
 ]

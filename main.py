@@ -22,8 +22,9 @@ def main():
         "media_geral",
         "Rede escolar",
         "Média geral",
+        dados=analisador.media_por_rede(),
     )
-    dashboard = Dashboard(analisador, grafico)
+    dashboard = Dashboard([grafico], analisador=analisador)
 
     print("\n2) Usar os objetos")
     print(dashboard.resumo_texto())

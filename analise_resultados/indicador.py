@@ -61,3 +61,12 @@ class IndicadorNota(Indicador):
         if self._valor_vazio():
             return "—"
         return f"{float(self.valor):.1f}".replace(".", ",")
+
+
+class IndicadorPontos(Indicador):
+    """Mostra uma diferença ou amplitude em pontos."""
+
+    def formatar(self):
+        if self._valor_vazio():
+            return "—"
+        return f"{float(self.valor):.1f}".replace(".", ",")
