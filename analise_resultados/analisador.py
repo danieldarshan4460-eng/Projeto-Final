@@ -15,8 +15,16 @@ NOTAS = [
 class AnalisadorDados:
     """Separa os cálculos da leitura e da preparação dos dados."""
 
-    def __init__(self, df: pd.DataFrame):
-        self.df = df.copy(deep=True)
+    def __init__(self, df: pd.DataFrame, copiar: bool = True):
+        # `copiar=False` evita duplicar tabelas grandes quando o DataFrame
+        # já é um resultado novo (por exemplo, o de um filtro).
+        self.__df = df.copy(deep=True) if copiar else df
+        self.__completos = None
+
+    @property
+    def df(self) -> pd.DataFrame:
+        """Dados analisados (somente leitura: use `filtrar` para outro recorte)."""
+        return self.__df
 
     def filtrar(
         self,
@@ -25,21 +33,24 @@ class AnalisadorDados:
         redes=None,
         localizacoes=None,
     ):
-        """Cria um novo analisador aplicando filtros opcionais."""
-        resultado = self.df.copy(deep=True)
+        """Cria um novo analisador aplicando filtros opcionais.
 
+        Lista vazia ou None significa "sem filtro" naquela coluna.
+        """
         filtros = (
             ("REGIAO", regioes),
             ("SG_UF_PROVA", ufs),
             ("REDE_NOME", redes),
             ("LOCALIZACAO_NOME", localizacoes),
         )
+        mascara = pd.Series(True, index=self.__df.index)
         for coluna, valores in filtros:
             if valores is not None and len(valores) > 0:
-                if coluna in resultado.columns:
-                    resultado = resultado.loc[resultado[coluna].isin(valores)].copy()
+                if coluna in self.__df.columns:
+                    mascara &= self.__df[coluna].isin(valores)
 
-        return AnalisadorDados(resultado)
+        # `.loc` com máscara já devolve um DataFrame novo.
+        return AnalisadorDados(self.__df.loc[mascara], copiar=False)
 
     def media_por_uf(self) -> pd.DataFrame:
         """Calcula a média geral de quem fez os dois dias, por UF."""
@@ -68,6 +79,10 @@ class AnalisadorDados:
         completos = self._participantes_completos()
         if completos.empty or coluna not in completos.columns:
             return pd.DataFrame(columns=["grupo", "pessoas", "media_geral"])
+        # Quem não tem escola informada fica com texto vazio: não é um grupo.
+        completos = completos.loc[completos[coluna].notna() & completos[coluna].ne("")]
+        if completos.empty:
+            return pd.DataFrame(columns=["grupo", "pessoas", "media_geral"])
         tabela = completos.groupby(coluna, observed=False).agg(
             pessoas=("MEDIA_GERAL", "size"),
             media_geral=("MEDIA_GERAL", "mean"),
@@ -92,10 +107,12 @@ class AnalisadorDados:
             ("Não fez nenhum", int((~dia1 & ~dia2).sum())),
         ]
         tabela = pd.DataFrame(linhas, columns=["etapa", "pessoas"])
-        tabela["percentual"] = (
-            tabela["pessoas"].astype("float64") / total * 100
-            if total else 0.0
-        ).round(1)
+        if total:
+            tabela["percentual"] = (
+                tabela["pessoas"].astype("float64") / total * 100
+            ).round(1)
+        else:
+            tabela["percentual"] = 0.0
         return tabela
 
     def estatisticas_descritivas(self) -> pd.DataFrame:
@@ -124,7 +141,12 @@ class AnalisadorDados:
         return pd.DataFrame(linhas)
 
     def _participantes_completos(self) -> pd.DataFrame:
-        """Seleciona quem fez os dois dias e tem as cinco notas."""
+        """Seleciona quem fez os dois dias e tem as cinco notas (calculado uma vez)."""
+        if self.__completos is None:
+            self.__completos = self._calcular_participantes_completos()
+        return self.__completos
+
+    def _calcular_participantes_completos(self) -> pd.DataFrame:
         dados = self.df
         colunas_presentes = [
             "TP_PRESENCA_LC", "TP_PRESENCA_MT",
@@ -139,12 +161,17 @@ class AnalisadorDados:
         )
         completos = dados.loc[fez_dois & dados[NOTAS].notna().all(axis=1)].copy()
         if completos.empty:
+            completos["MEDIA_GERAL"] = pd.Series(dtype="float64")
             return completos
 
         notas = completos[NOTAS].astype("float64")
         completos["MEDIA_GERAL"] = notas.mean(axis=1)
         completos["MEDIA_GERAL"] = completos["MEDIA_GERAL"].astype("float64")
         return completos
+
+    def media_geral(self) -> float:
+        """Média geral de quem fez os dois dias e tem as cinco notas."""
+        return self._media_geral()
 
     def _media_geral(self):
         completos = self._participantes_completos()

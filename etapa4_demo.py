@@ -106,6 +106,7 @@ def main() -> None:
         print(f"- {linha.grupo}: {numero_brasileiro(linha.media_geral)}")
 
     print("\n6. Filtro: Nordeste + Estadual")
+    inscritos_antes = len(analisador.df)
     filtrado = analisador.filtrar(regioes=["Nordeste"], redes=["Estadual"])
     print(f"- Inscritos: {inteiro_brasileiro(len(filtrado.df))}")
 
@@ -118,8 +119,9 @@ def main() -> None:
         print(f"- {indicador.descricao}: {indicador.formatar()}")
 
     print("\n7. Prova de que o original não mudou")
-    print(f"- Total de inscritos antes do filtro: {inteiro_brasileiro(len(analisador.df))}")
-    print(f"- Total de inscritos depois do filtro: {inteiro_brasileiro(len(analisador.df))}")
+    print(f"- Inscritos no original antes de filtrar: {inteiro_brasileiro(inscritos_antes)}")
+    print(f"- Inscritos no original depois de filtrar: {inteiro_brasileiro(len(analisador.df))}")
+    print(f"- Inscritos no recorte filtrado: {inteiro_brasileiro(len(filtrado.df))}")
 
 
 if __name__ == "__main__":

@@ -1,14 +1,16 @@
 """Classes simples para criar os gráficos da Etapa 5."""
 
+from abc import ABC, abstractmethod
+
 import plotly.express as px
 
 
-class Visualizador:
+class Visualizador(ABC):
     """Base de todos os gráficos."""
 
+    @abstractmethod
     def gerar(self):
         """Cada classe filha cria e devolve uma figura."""
-        raise NotImplementedError("A classe filha deve implementar gerar().")
 
 
 class GraficoBarras(Visualizador):
@@ -18,7 +20,9 @@ class GraficoBarras(Visualizador):
         self.dados = dados
 
     def gerar(self):
-        dados = self.dados.sort_values("media_geral", ascending=True)
+        dados = self.dados.dropna(subset=["media_geral"]).sort_values(
+            "media_geral", ascending=True
+        )
         figura = px.bar(
             dados,
             x="media_geral",
@@ -89,7 +93,7 @@ class GraficoTreemap(Visualizador):
         self.dados = dados
 
     def gerar(self):
-        dados = self.dados.copy()
+        dados = self.dados.dropna(subset=["media_geral"]).copy()
         dados["Brasil"] = "Brasil"
         figura = px.treemap(
             dados,
@@ -125,7 +129,7 @@ class GraficoDispersao(Visualizador):
 
     def gerar(self):
         figura = px.scatter(
-            self.dados,
+            self.dados.dropna(subset=["media_geral", "presenca_2dia"]),
             x="presenca_2dia",
             y="media_geral",
             size="inscritos",

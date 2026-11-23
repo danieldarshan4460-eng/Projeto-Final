@@ -1,9 +1,11 @@
-<<<<<<< HEAD
+# Dados do projeto (arquivos grandes, não vão para o Git)
 data/*.csv
 data/*.parquet
-.venv/
-__pycache__/
-=======
+
+# Saídas geradas localmente pelos scripts de gráficos
+saidas/etapa5/
+
+# --- Modelo padrão de .gitignore para Python ---
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -224,4 +226,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
->>>>>>> af544c599abeb8b6d6e04bbae8de9d3e843b822c
