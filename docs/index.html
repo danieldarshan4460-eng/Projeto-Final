@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projeto Final — Análise dos resultados do ENEM 2025</title>
+<style>
+  :root { --fundo:#ffffff; --texto:#1f2430; --suave:#5b6275; --borda:#d9dce5; --destaque:#1a56db; --caixa:#f4f6fb; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fundo:#14161c; --texto:#e8eaf0; --suave:#a3a9ba; --borda:#2c303c; --destaque:#7ea6ff; --caixa:#1c1f28; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--fundo); color:var(--texto); font:16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header, main, footer { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+  header { padding-top: 40px; padding-bottom: 12px; }
+  h1 { font-size: 1.9rem; line-height: 1.25; margin: 0 0 6px; }
+  h2 { font-size: 1.35rem; margin: 42px 0 8px; padding-top: 10px; border-top: 1px solid var(--borda); }
+  h3 { font-size: 1.05rem; margin: 22px 0 4px; }
+  p, li { max-width: 72ch; }
+  a { color: var(--destaque); }
+  .sub { color: var(--suave); margin: 0; }
+  nav { background: var(--caixa); border:1px solid var(--borda); border-radius:10px; padding: 12px 18px; margin: 18px 0; }
+  nav ol { margin: 4px 0; padding-left: 20px; columns: 2; column-gap: 28px; }
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; margin: 10px 0; }
+  th, td { border:1px solid var(--borda); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--caixa); }
+  .rolagem { overflow-x: auto; }
+  code { background: var(--caixa); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+  pre { background: var(--caixa); border:1px solid var(--borda); border-radius:8px; padding: 12px 14px; overflow-x:auto; font-size:.88rem; }
+  iframe { width:100%; height: 480px; border:1px solid var(--borda); border-radius:8px; background:#fff; }
+  .nota { background: var(--caixa); border-left: 4px solid var(--destaque); padding: 8px 14px; border-radius: 4px; margin: 14px 0; }
+  footer { color: var(--suave); font-size:.9rem; padding-top: 30px; padding-bottom: 50px; }
+  @media (max-width: 640px) { nav ol { columns: 1; } h1 { font-size: 1.5rem; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Análise e dashboard dos resultados do ENEM 2025</h1>
+  <p class="sub">Projeto Final — Programação Orientada a Objetos · Ciência de Dados e Inteligência Artificial</p>
+  <nav aria-label="Sumário">
+    <strong>Sumário</strong>
+    <ol>
+      <li><a href="#justificativa">Justificativa do tema</a></li>
+      <li><a href="#fonte">Fonte pública de dados</a></li>
+      <li><a href="#variaveis">Variáveis utilizadas</a></li>
+      <li><a href="#tratamento">Tratamento e análise dos dados</a></li>
+      <li><a href="#arquitetura">Arquitetura orientada a objetos</a></li>
+      <li><a href="#classes">Classes e responsabilidades</a></li>
+      <li><a href="#indicadores">Indicadores</a></li>
+      <li><a href="#graficos">Gráficos e interpretação</a></li>
+      <li><a href="#dashboard">Funcionamento do dashboard</a></li>
+      <li><a href="#conclusoes">Conclusões e limitações</a></li>
+      <li><a href="#referencias">Referências</a></li>
+    </ol>
+  </nav>
+</header>
+
+<main>
+<h2 id="justificativa">1. Justificativa do tema</h2>
+<p>O ENEM é a principal porta de entrada para o ensino superior no Brasil, e seus resultados permitem observar desigualdades educacionais entre regiões, estados e tipos de escola. Os dados são públicos, volumosos (mais de 4,8 milhões de inscritos) e têm estrutura rica em variáveis numéricas e categóricas, o que os torna adequados para praticar tratamento e análise com Pandas, modelagem orientada a objetos e visualização interativa.</p>
+<p><strong>Problema investigado:</strong> como o desempenho e a participação no ENEM 2025 variam entre regiões, UFs e tipos de escola?</p>
+<p><strong>Objetivo:</strong> oferecer um painel que apoie a leitura desses resultados e a comparação entre grupos.</p>
+<p><strong>Perguntas da análise:</strong></p>
+<ol>
+  <li>Quantos inscritos realmente fizeram as provas, e quantos faltaram a um ou aos dois dias?</li>
+  <li>Como a média geral varia entre regiões e UFs?</li>
+  <li>Existe diferença de desempenho entre os tipos de escola (federal, estadual, municipal, privada) e entre escolas urbanas e rurais?</li>
+</ol>
+
+<h2 id="fonte">2. Fonte pública de dados</h2>
+<p>Portal de Dados Abertos do <strong>INEP</strong> (categoria Educação): arquivo <code>RESULTADOS_2025.csv</code>, com os resultados do ENEM 2025 por inscrito (identificados apenas por número sequencial). O arquivo tem <strong>4.810.772 linhas</strong> e <strong>70 variáveis</strong>, separador <code>;</code> e codificação <code>latin1</code>. Endereço: <a href="https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos">gov.br/inep — dados abertos</a>.</p>
+<p>Por ser grande, o arquivo não é versionado no Git. O script <code>scripts/item7_arquivo_reduzido.py</code> gera uma cópia reduzida em Parquet (<code>data/resultados_reduzido.parquet</code>), que o dashboard lê.</p>
+
+<h2 id="variaveis">3. Variáveis utilizadas</h2>
+<div class="rolagem"><table>
+  <tr><th>Variável</th><th>Descrição</th></tr>
+  <tr><td><code>NU_SEQUENCIAL</code></td><td>Identificador do inscrito (usado para detectar duplicidades)</td></tr>
+  <tr><td><code>SG_UF_PROVA</code></td><td>UF onde a prova foi feita</td></tr>
+  <tr><td><code>TP_DEPENDENCIA_ADM_ESC</code></td><td>Rede da escola: 1 Federal, 2 Estadual, 3 Municipal, 4 Privada</td></tr>
+  <tr><td><code>TP_LOCALIZACAO_ESC</code></td><td>Localização da escola: 1 Urbana, 2 Rural</td></tr>
+  <tr><td><code>TP_PRESENCA_LC</code></td><td>Presença no 1º dia (Linguagens e Ciências Humanas); 1 = presente</td></tr>
+  <tr><td><code>TP_PRESENCA_MT</code></td><td>Presença no 2º dia (Natureza e Matemática); 1 = presente</td></tr>
+  <tr><td><code>NU_NOTA_CN</code>, <code>NU_NOTA_CH</code>, <code>NU_NOTA_LC</code>, <code>NU_NOTA_MT</code></td><td>Notas de Ciências da Natureza, Ciências Humanas, Linguagens e Matemática</td></tr>
+  <tr><td><code>NU_NOTA_REDACAO</code></td><td>Nota da redação (0 a 1.000)</td></tr>
+</table></div>
+<p>Colunas criadas no tratamento: <code>REGIAO</code> (a partir da UF), <code>REDE_NOME</code>, <code>LOCALIZACAO_NOME</code> e <code>MEDIA_GERAL</code> (média simples das cinco notas, calculada só para quem fez os dois dias e tem todas as notas).</p>
+
+<h2 id="tratamento">4. Tratamento e análise dos dados</h2>
+<h3>Exploração inicial (Etapa 2)</h3>
+<ul>
+  <li><strong>Duplicidades:</strong> nenhum <code>NU_SEQUENCIAL</code> repetido nem vazio (4.810.772 ids únicos).</li>
+  <li><strong>Inconsistências:</strong> 26 verificações (notas fora de 0–1.000, presença incoerente com nota, rede e localização inválidas etc.). Só uma encontrou ocorrências: a UF da escola é diferente da UF da prova em 16.672 inscritos (0,35%), o que pode acontecer quando a pessoa faz a prova em outro estado.</li>
+  <li><strong>Ausentes:</strong> 63,9% dos inscritos não têm escola informada (3.071.744), logo não têm rede nem localização. As notas ausentes correspondem a quem faltou à prova.</li>
+</ul>
+<h3>Tratamento no sistema (<code>TratadorDados</code>)</h3>
+<ol>
+  <li>Remove duplicados pelo número sequencial.</li>
+  <li>Conta as notas ausentes e <strong>não as substitui</strong> (quem faltou não recebe nota). Remove linhas sem UF da prova.</li>
+  <li>Cria <code>REGIAO</code>, <code>REDE_NOME</code> e <code>LOCALIZACAO_NOME</code>.</li>
+</ol>
+<h3>Análise (<code>AnalisadorDados</code>)</h3>
+<p>Seleção e filtragem por região, UF, rede e localização; agrupamentos (<code>groupby</code>) por UF, região, rede e localização; ordenação; estatísticas descritivas (média, mediana, desvio padrão, mínimo e máximo) para cada prova; funil de presença; histograma da redação.</p>
+
+<h2 id="arquitetura">5. Arquitetura orientada a objetos</h2>
+<pre>FonteDados (abstrata)              Indicador                     Visualizador (abstrata)
+ ├─ FonteParquet                    ├─ Numerico                   ├─ GraficoBarras
+ └─ FonteCSV                        ├─ Percentual                 ├─ GraficoLinhas
+                                    ├─ Nota                       ├─ GraficoTreemap
+TratadorDados                       └─ IndicadorPontos            ├─ GraficoDispersao
+AnalisadorDados ──► Indicador                                     └─ GraficoHistograma
+InterpretadorResultados ──► AnalisadorDados
+Dashboard ──► lista de Visualizador        PainelENEM (app.py) ──► tudo acima</pre>
+<h3>Conceitos de POO aplicados</h3>
+<ul>
+  <li><strong>Construtores e atributos:</strong> todas as classes recebem suas dependências em <code>__init__</code>.</li>
+  <li><strong>Encapsulamento:</strong> atributos privados (<code>__df</code> no tratador e no analisador, <code>__descricao</code> e <code>__valor</code> nos indicadores) expostos só por <code>property</code> somente leitura.</li>
+  <li><strong>Herança e polimorfismo:</strong> <code>FonteParquet</code> e <code>FonteCSV</code> herdam de <code>FonteDados</code>; os quatro tipos de indicador sobrescrevem <code>formatar()</code>; os cinco gráficos sobrescrevem <code>gerar()</code> e o <code>Dashboard</code> chama todos sem saber o tipo.</li>
+  <li><strong>Abstração:</strong> <code>FonteDados</code> e <code>Visualizador</code> são classes abstratas (<code>ABC</code>) e não podem ser instanciadas.</li>
+</ul>
+<h3>Princípios SOLID</h3>
+<ul>
+  <li><strong>S</strong> — cada classe tem uma responsabilidade: ler (<code>Fonte*</code>), limpar (<code>TratadorDados</code>), calcular (<code>AnalisadorDados</code>), formatar (<code>Indicador</code>), explicar (<code>InterpretadorResultados</code>), desenhar (<code>Visualizador</code>).</li>
+  <li><strong>O</strong> — para um novo gráfico ou uma nova fonte basta criar uma subclasse; <code>Dashboard</code> e <code>TratadorDados</code> não mudam.</li>
+  <li><strong>L</strong> — qualquer subclasse de <code>Visualizador</code>, <code>Indicador</code> ou <code>FonteDados</code> pode ser usada no lugar da base.</li>
+  <li><strong>I</strong> — interfaces mínimas: <code>carregar()</code>, <code>formatar()</code> e <code>gerar()</code>.</li>
+  <li><strong>D</strong> — <code>Dashboard</code> depende da abstração <code>Visualizador</code>, e <code>etapa5_graficos.py</code> escolhe a fonte como <code>FonteDados</code>, sem depender de um formato.</li>
+</ul>
+
+<h2 id="classes">6. Classes implementadas</h2>
+<div class="rolagem"><table>
+  <tr><th>Classe</th><th>Arquivo</th><th>Responsabilidade</th></tr>
+  <tr><td><code>FonteDados</code>, <code>FonteParquet</code>, <code>FonteCSV</code></td><td><code>fonte.py</code></td><td>Validar o pedido e carregar apenas as colunas necessárias</td></tr>
+  <tr><td><code>TratadorDados</code></td><td><code>tratador.py</code></td><td>Remover duplicados, tratar ausentes, criar colunas derivadas e emitir relatório</td></tr>
+  <tr><td><code>AnalisadorDados</code></td><td><code>analisador.py</code></td><td>Filtros, agrupamentos, estatísticas, funil, histogramas e indicadores</td></tr>
+  <tr><td><code>Indicador</code> e subclasses</td><td><code>indicador.py</code></td><td>Guardar descrição e valor e formatá-lo (número, %, nota, pontos)</td></tr>
+  <tr><td><code>InterpretadorResultados</code></td><td><code>interpretador.py</code></td><td>Transformar as tabelas em frases de análise que acompanham os filtros</td></tr>
+  <tr><td><code>Visualizador</code> e 5 gráficos, <code>Dashboard</code></td><td><code>visualizador.py</code></td><td>Gerar as figuras Plotly e organizá-las em lista</td></tr>
+  <tr><td><code>PainelENEM</code></td><td><code>app.py</code></td><td>Montar a página Streamlit: cabeçalho, filtros, KPIs, gráficos, tabelas e análise</td></tr>
+</table></div>
+
+<h2 id="indicadores">7. Indicadores desenvolvidos</h2>
+<div class="rolagem"><table>
+  <tr><th>Indicador</th><th>Como é calculado</th></tr>
+  <tr><td>Inscritos</td><td>Total de linhas do recorte</td></tr>
+  <tr><td>Presença no 1º dia</td><td>% com <code>TP_PRESENCA_LC = 1</code></td></tr>
+  <tr><td>Presença no 2º dia</td><td>% com <code>TP_PRESENCA_MT = 1</code></td></tr>
+  <tr><td>Média geral</td><td>Média das cinco notas de quem fez os dois dias e tem todas as notas</td></tr>
+  <tr><td>Redações com nota zero</td><td>% de zeros entre quem tem nota de redação</td></tr>
+  <tr><td>Não fez nenhum dia</td><td>% de inscritos ausentes nos dois dias</td></tr>
+  <tr><td>Diferença privada × estadual</td><td>Média geral da rede privada menos a da estadual</td></tr>
+  <tr><td>Amplitude entre UFs</td><td>Maior média por UF menos a menor</td></tr>
+</table></div>
+
+<h2 id="graficos">8. Gráficos e interpretação</h2>
+<div class="nota">Os números citados vêm da exploração da Etapa 2 (arquivo completo, sem filtros). No dashboard eles mudam conforme os filtros.
+Os gráficos abaixo são gerados por <code>python etapa5_graficos.py docs/graficos</code>.</div>
+
+<h3>Barras — média geral por UF</h3>
+<iframe src="graficos/barras_media_uf.html" title="Média geral por UF" loading="lazy">Gráfico indisponível: gere os arquivos com etapa5_graficos.py.</iframe>
+<p>SP tem a maior média (557,9), seguida de DF (556,8) e SC (555,8); AM tem a menor (489,1). A amplitude entre UFs é de cerca de 69 pontos, e sete das oito UFs do topo são do Sul ou do Sudeste.</p>
+
+<h3>Linhas — distribuição da média geral por tipo de escola</h3>
+<iframe src="graficos/linhas_distribuicao_rede.html" title="Distribuição por tipo de escola" loading="lazy">Gráfico indisponível.</iframe>
+<p>A rede privada tem média de 610,5, a federal 583,5, a municipal 540,0 e a estadual 497,1. A rede estadual é a maior em número de participantes (961 mil com os dois dias) e tem a menor média. É uma comparação descritiva e não indica que o tipo de escola causa a diferença.</p>
+
+<h3>Treemap — inscritos e média por região e UF</h3>
+<iframe src="graficos/treemap_brasil.html" title="Treemap Brasil" loading="lazy">Gráfico indisponível.</iframe>
+<p>O tamanho do bloco é o número de inscritos e a cor é a média geral. Sudeste e Nordeste concentram a maior parte dos participantes; o Sudeste tem média de 554,2 e o Nordeste de 515,3 (Norte: 496,8).</p>
+
+<h3>Dispersão — presença no 2º dia × média geral por UF</h3>
+<iframe src="graficos/dispersao_uf.html" title="Dispersão" loading="lazy">Gráfico indisponível.</iframe>
+<p>Cada ponto é uma UF, com tamanho proporcional aos inscritos. Permite verificar se UFs com mais abstenção também têm menor média. Como é um gráfico por UF (e não por pessoa), a relação observada não vale para indivíduos.</p>
+
+<h3>Histograma — notas de redação</h3>
+<iframe src="graficos/histograma_redacao.html" title="Histograma da redação" loading="lazy">Gráfico indisponível.</iframe>
+<p>A média da redação é 580,8 e a mediana 600,0, com desvio padrão alto (212,9). Notas zero somam 6,1% de quem fez a redação; entre os participantes completos com escola informada, esse percentual é de 1,0% na rede privada e 8,2% na estadual.</p>
+
+<h2 id="dashboard">9. Funcionamento do dashboard</h2>
+<p>Aplicação Streamlit (<code>streamlit run app.py</code>) com:</p>
+<ul>
+  <li><strong>Cabeçalho</strong> com título, fonte dos dados e um resumo do tratamento.</li>
+  <li><strong>Filtros</strong> na barra lateral: região, UF (as opções acompanham as regiões escolhidas), tipo de escola e localização. Filtro vazio significa "todos".</li>
+  <li><strong>KPIs</strong>: os oito indicadores, recalculados a cada filtro.</li>
+  <li><strong>Visualizações</strong> em abas: média por UF (barras e dispersão), treemap, tipo de escola (linhas) e histograma da redação.</li>
+  <li><strong>Tabelas</strong>: resumo por UF (com download em CSV), estatísticas por prova e funil de presença.</li>
+  <li><strong>Análise interpretativa</strong>: texto gerado por <code>InterpretadorResultados</code> a partir do recorte atual, seguido das limitações.</li>
+</ul>
+<p>Os dados são carregados e tratados uma única vez e o resultado de cada combinação de filtros fica em cache, para o painel responder rápido.</p>
+
+<h2 id="conclusoes">10. Conclusões e limitações</h2>
+<h3>Conclusões</h3>
+<ul>
+  <li>67,4% dos inscritos fizeram os dois dias e 27,8% faltaram aos dois; o 1º dia teve 71,9% de presença e o 2º, 67,8%.</li>
+  <li>A média geral é mais alta no Sudeste, Sul e Centro-Oeste do que no Nordeste e no Norte.</li>
+  <li>A rede privada tem média cerca de 113 pontos acima da estadual (610,5 contra 497,1), e escolas urbanas superam as rurais em cerca de 43 pontos (526,2 contra 483,3).</li>
+</ul>
+<h3>Limitações</h3>
+<ul>
+  <li>Rede e localização existem só para os inscritos com escola informada (36% do arquivo).</li>
+  <li>Os dados não trazem renda, escolaridade dos pais nem outras variáveis socioeconômicas; por isso as diferenças entre grupos são descritivas e não causais.</li>
+  <li>A média geral usa apenas quem fez os dois dias, então desconsidera os participantes que faltaram a um deles.</li>
+  <li>A análise é por UF da prova, não por município nem por escola.</li>
+</ul>
+
+<h2 id="referencias">11. Referências</h2>
+<ul>
+  <li>INEP. <em>Dados abertos</em>. <a href="https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos">gov.br/inep/pt-br/acesso-a-informacao/dados-abertos</a>.</li>
+  <li>Pandas. <em>Documentation</em>. <a href="https://pandas.pydata.org/docs/">pandas.pydata.org/docs</a>.</li>
+  <li>Plotly. <em>Plotly Python Graphing Library</em>. <a href="https://plotly.com/python/">plotly.com/python</a>.</li>
+  <li>Streamlit. <em>Documentation</em>. <a href="https://docs.streamlit.io/">docs.streamlit.io</a>.</li>
+  <li>Martin, R. C. <em>Clean Architecture</em>. Princípios SOLID.</li>
+  <li>Python Software Foundation. <em>abc — Abstract Base Classes</em>. <a href="https://docs.python.org/3/library/abc.html">docs.python.org/3/library/abc.html</a>.</li>
+</ul>
+</main>
+<footer>Projeto Final — Programação Orientada a Objetos · Ciência de Dados e Inteligência Artificial</footer>
+</body>
+</html>
