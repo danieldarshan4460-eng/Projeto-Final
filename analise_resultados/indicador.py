@@ -9,8 +9,16 @@ class Indicador:
     """Guarda uma descrição e um valor para um indicador."""
 
     def __init__(self, descricao: str, valor):
-        self.descricao = descricao
-        self.valor = valor
+        self.__descricao = descricao
+        self.__valor = valor
+
+    @property
+    def descricao(self) -> str:
+        return self.__descricao
+
+    @property
+    def valor(self):
+        return self.__valor
 
     def _valor_valido(self) -> bool:
         if self.valor is None:
