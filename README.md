@@ -53,3 +53,9 @@ python -m unittest discover -s tests -v
 ## Documentação
 
 Publicada no GitHub Pages (branch `gh-pages`, gerada a partir da pasta `docs/`).
+
+## Dados Necessários 
+
+https://drive.google.com/file/d/1oPxkaJAr86BBlveYQbIwBvLx7SXmR3PF/view?usp=sharing
+(Coloque na pasta data dentro da pasta do projeto)
+
